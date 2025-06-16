@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mapa de Conocimiento: Unidad 1 - RRII</title>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    
+    <style type="text/css">
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #333;
+            background-color: #f4f7f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #003366;
+            text-align: center;
+        }
+        #mynetwork {
+            width: 90vw;
+            height: 70vh;
+            border: 1px solid #ccc;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .filter-controls {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+        }
+        .filter-controls button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .filter-controls button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Mapa Interactivo: Unidad 1 - Origen de la Teoría de las RRII</h1>
+    <div class="filter-controls">
+        <span>Filtrar por temática:</span>
+        <button onclick="filterNodes('todos')">Todos</button>
+        <button onclick="filterNodes('idealismo')">Debate: Idealismo</button>
+        <button onclick="filterNodes('realismo')">Debate: Realismo</button>
+        <button onclick="filterNodes('autores')">Autores</button>
+    </div>
+    
+    <div id="mynetwork"></div>
+
+    <script type="text/javascript">
+        // 1. DEFINICIÓN DE NODOS (CONCEPTOS)
+        // Cada nodo tiene un id único, una etiqueta (label) que se muestra,
+        // un título (title) para el texto al pasar el cursor, y un grupo para el filtro.
+        const nodes = new vis.DataSet([
+            // Nivel 0 - Central
+            { id: 1, label: 'UNIDAD 1\nCrisis y Origen de las RRII', title: 'Analiza el surgimiento de la teoría de las Relaciones Internacionales como disciplina científica, nacida de la crisis política y la necesidad de comprender las causas de la 1° Guerra Mundial. ', group: 'central', level: 0, mass: 3, font: {size: 18}},
+            
+            // Nivel 1 - Ramas Principales
+            { id: 2, label: 'El Primer Debate Teórico', group: 'rama', level: 1 },
+            { id: 3, label: 'Conceptos Fundamentales', group: 'rama', level: 1 },
+            { id: 4, label: 'Autores Clave', group: 'autores', level: 1 },
+            { id: 5, label: 'Contexto Histórico', group: 'contexto', level: 1 },
+            
+            // Nivel 2 - Nodos Específicos
+            { id: 6, label: 'Idealismo', title: 'Corriente optimista que confía en la razón, la moral y las instituciones internacionales para erradicar la guerra y promover la cooperación.', group: 'idealismo', level: 2 },
+            { id: 7, label: 'Realismo', title: 'Corriente que ve la política internacional como una lucha incesante por el poder en un sistema anárquico, donde los Estados buscan garantizar su supervivencia. ', group: 'realismo', level: 2 },
+            
+            { id: 8, label: 'Seguridad Colectiva', title: 'Principio idealista que sostiene que un ataque contra un miembro de la comunidad internacional será respondido por todos, buscando disuadir la agresión. ', group: 'idealismo', level: 3 },
+            { id: 9, label: 'Equilibrio de Poder', title: 'Concepto realista donde la paz y la estabilidad se mantienen mediante una distribución de poder tal que ningún Estado pueda imponerse sobre los demás. ', group: 'realismo', level: 3 },
+            
+            { id: 10, label: 'Edward H. Carr', title: 'Autor de "La Crisis de los Veinte Años", es la figura central del realismo que realizó la crítica más devastadora a las utopías del pensamiento idealista. ', group: 'autores', level: 2 },
+            { id: 11, label: 'John H. Herz', title: 'Académico que profundizó en la distinción entre Realismo e Idealismo Político, analizando el "dilema de seguridad" que enfrentan los Estados. ', group: 'autores', level: 2 },
+            
+            { id: 12, label: 'Período de Entreguerras\n(1919-1939)', title: 'Las dos décadas de inestabilidad política, económica y social entre el fin de la 1° Guerra Mundial y el inicio de la 2°, considerado el laboratorio donde nació la disciplina de las RRII. ', group: 'contexto', level: 2 },
+            { id: 13, label: '1° Guerra Mundial', title: 'El conflicto catastrófico que destruyó el viejo orden europeo y generó el impulso inicial para estudiar científicamente las relaciones internacionales con el fin de evitar su repetición. ', group: 'contexto', level: 3 },
+        ]);
+
+        // 2. DEFINICIÓN DE ARISTAS (CONEXIONES)
+        const edges = new vis.DataSet([
+            { from: 1, to: 2 }, { from: 1, to: 3 }, { from: 1, to: 4 }, { from: 1, to: 5 },
+            
+            { from: 2, to: 6, label: 'vs' }, { from: 2, to: 7, label: 'vs' },
+            
+            { from: 3, to: 8 }, { from: 3, to: 9 },
+            
+            { from: 6, to: 8, dashes: true, label: 'propone' }, // Idealismo -> Seguridad Colectiva
+            { from: 7, to: 9, dashes: true, label: 'propone' }, // Realismo -> Equilibrio de Poder
+            
+            { from: 4, to: 10 }, { from: 4, to: 11 },
+            { from: 10, to: 7, dashes: true, label: 'fundamenta' }, // Carr -> Realismo
+            { from: 11, to: 7, dashes: true, label: 'fundamenta' }, // Herz -> Realismo
+            
+            { from: 5, to: 12 },
+            { from: 12, to: 2, dashes: true, label: 'genera' }, // Periodo -> Debate
+            { from: 13, to: 6, dashes: true, label: 'impulsa' }  // 1GM -> Idealismo
+        ]);
+
+        // 3. CREACIÓN DE LA VISUALIZACIÓN
+        const container = document.getElementById('mynetwork');
+        const data = { nodes: nodes, edges: edges };
+        const options = {
+            layout: {
+                hierarchical: {
+                    direction: "DU", // De arriba hacia abajo
+                    sortMethod: "hubsize",
+                    levelSeparation: 150,
+                }
+            },
+            interaction: {
+                hover: true // Habilita el efecto al pasar el cursor
+            },
+            physics: {
+                enabled: false // Deshabilitamos físicas para mantener la jerarquía
+            },
+            nodes: {
+                shape: 'box',
+                margin: 10,
+                font: {
+                    size: 14,
+                    color: '#333'
+                },
+                borderWidth: 2,
+                shadow: true,
+            },
+            edges: {
+                width: 2,
+                font: {
+                    align: 'middle'
+                },
+                arrows: 'to'
+            },
+            groups: {
+                central: { color: { background: '#003366', border: '#001a33' }, font: { color: 'white' } },
+                rama: { color: { background: '#e9ecef', border: '#ced4da' } },
+                idealismo: { color: { background: '#cce5ff', border: '#b8daff' } },
+                realismo: { color: { background: '#f8d7da', border: '#f5c6cb' } },
+                autores: { color: { background: '#d4edda', border: '#c3e6cb' } },
+                contexto: { color: { background: '#fff3cd', border: '#ffeeba' } }
+            }
+        };
+
+        const network = new vis.Network(container, data, options);
+        
+        // 4. FUNCIÓN PARA FILTRAR
+        function filterNodes(groupName) {
+            const allNodes = nodes.get({ returnType: "Object" });
+            let nodesToUpdate = [];
+
+            for (const nodeId in allNodes) {
+                let node = allNodes[nodeId];
+                let shouldBeVisible = true;
+
+                if (groupName !== 'todos' && node.group !== groupName && node.group !== 'central' && node.group !== 'rama') {
+                   shouldBeVisible = false;
+                }
+                
+                // Si el nodo ha cambiado su estado de visibilidad
+                if (node.hidden !== !shouldBeVisible) {
+                    nodesToUpdate.push({ id: node.id, hidden: !shouldBeVisible });
+                }
+            }
+            
+            if (nodesToUpdate.length > 0) {
+                nodes.update(nodesToUpdate);
+            }
+        }
+        
+        // Hacer la función de filtro accesible globalmente
+        window.filterNodes = filterNodes;
+
+    </script>
+
+</body>
+</html>
